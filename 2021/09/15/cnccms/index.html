@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="环境搭建 下载源码，导入idea 修改WEB-INF&#x2F;classes&#x2F;db.properties 数据库创建cncsnet，执行文件夹里的sql tomcat配置添加文件夹，修改Application context为&#x2F;，可以解决一些报错和图片不加载等问题   代码审计前台大致浏览了一些功能点，发现只有作品展示和团队新闻可能存在sql注入，别的地方都没有什么可以交互的地方。 发现使用的是mybat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java代码审计学习（三）">
+<meta property="og:url" content="https://blog.b1ank.top/2021/09/15/cnccms/index.html">
+<meta property="og:site_name" content="b1ank&#39;s blog">
+<meta property="og:description" content="环境搭建 下载源码，导入idea 修改WEB-INF&#x2F;classes&#x2F;db.properties 数据库创建cncsnet，执行文件夹里的sql tomcat配置添加文件夹，修改Application context为&#x2F;，可以解决一些报错和图片不加载等问题   代码审计前台大致浏览了一些功能点，发现只有作品展示和团队新闻可能存在sql注入，别的地方都没有什么可以交互的地方。 发现使用的是mybat">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/15/cnccms/image-20210915155022149.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/15/cnccms/image-20210915153040369.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/15/cnccms/image-20210915174322383.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/15/cnccms/image-20210915174339039.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/15/cnccms/image-20210915174352412.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/15/cnccms/image-20210915183238697.png">
+<meta property="og:image" content="https://blog.b1ank.top/2021/09/15/cnccms/image-20210915183836772.png">
+<meta property="article:published_time" content="2021-09-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-15T10:53:31.788Z">
+<meta property="article:author" content="b1ank">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.b1ank.top/2021/09/15/cnccms/image-20210915155022149.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Java代码审计学习（三）</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" "Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post " href="/2021/09/08/opencar/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top " href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post " href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.b1ank.top/2021/09/15/cnccms/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.b1ank.top/2021/09/15/cnccms/&text=Java代码审计学习（三）"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.b1ank.top/2021/09/15/cnccms/&is_video=false&description=Java代码审计学习（三）"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java代码审计学习（三）&body=Check out this article: https://blog.b1ank.top/2021/09/15/cnccms/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.b1ank.top/2021/09/15/cnccms/&name=Java代码审计学习（三）&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.b1ank.top/2021/09/15/cnccms/&t=Java代码审计学习（三）"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1"><span class="toc-number">2.</span> <span class="toc-text">代码审计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%89%8D%E5%8F%B0"><span class="toc-number">2.1.</span> <span class="toc-text">前台</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8E%E5%8F%B0"><span class="toc-number">2.2.</span> <span class="toc-text">后台</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#xss"><span class="toc-number">2.2.1.</span> <span class="toc-text">xss</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="toc-number">2.3.</span> <span class="toc-text">文件上传</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reference"><span class="toc-number">4.</span> <span class="toc-text">Reference</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Java代码审计学习（三）
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">b1ank</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-09-14T16:00:00.000Z" itemprop="datePublished">2021-09-15</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><ol>
+<li>下载<a target="_blank" rel="noopener" href="https://down.chinaz.com/soft/38847.htm">源码</a>，导入idea</li>
+<li>修改<code>WEB-INF/classes/db.properties</code></li>
+<li>数据库创建cncsnet，执行文件夹里的sql</li>
+<li>tomcat配置添加文件夹，修改<code>Application context</code>为<code>/</code>，可以解决一些报错和图片不加载等问题</li>
+</ol>
+<p><img src="/2021/09/15/cnccms/image-20210915155022149.png" alt="image-20210915155022149"></p>
+<h3 id="代码审计"><a href="#代码审计" class="headerlink" title="代码审计"></a>代码审计</h3><h4 id="前台"><a href="#前台" class="headerlink" title="前台"></a>前台</h4><p>大致浏览了一些功能点，发现只有作品展示和团队新闻可能存在sql注入，别的地方都没有什么可以交互的地方。</p>
+<p>发现使用的是mybatis，并且不存在<code>$&#123;&#125;</code>这样进行sql拼接的地方，包括像like语句，所以基本上没有sql注入了，参考<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MjM5OTk2MTMxOQ==&mid=2727827368&idx=1&sn=765d0835f0069b5145523c31e8229850&mpshare=1&scene=1&srcid=0926a6QC3pGbQ3Pznszb4n2q#rd">Mybatis框架下SQL注入漏洞面面观</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//and member_name like #&#123;member_name&#125;</span></span><br><span class="line">tempUser.setUsername(<span class="string">&quot;%&quot;</span> + ccUsers.getUsername() + <span class="string">&quot;%&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/09/15/cnccms/image-20210915153040369.png" alt="image-20210915153040369"></p>
+<h4 id="后台"><a href="#后台" class="headerlink" title="后台"></a>后台</h4><p><code>admin/ningyang</code>登录后台</p>
+<h5 id="xss"><a href="#xss" class="headerlink" title="xss"></a>xss</h5><p><code>WEB-INF/classes/cn/cncsnet/controller/WorkController.class</code></p>
+<p><code>WEB-INF/classes/cn/cncsnet/controller/LoadIndex.class</code></p>
+<p>这两处分别是前台和后台作品展示处，都是直接从数据库获取数据，不经过编码直接输出</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">  <span class="meta">@RequestMapping(&#123;&quot;work&quot;&#125;)</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">work</span><span class="params">(<span class="meta">@RequestParam(defaultValue = &quot;1&quot;,required = true)</span> Integer page, <span class="meta">@RequestParam(defaultValue = &quot;1&quot;,required = true)</span> Integer juan)</span> </span>&#123;</span><br><span class="line">      Integer pagesize = <span class="number">8</span>;</span><br><span class="line">      PageInfo&lt;CcWorks&gt; pageinfo = <span class="keyword">this</span>.loadIndexService.selecWork(page, pagesize);</span><br><span class="line">      List&lt;CcWorks&gt; list = pageinfo.getList();</span><br><span class="line">      ModelAndView mlv = <span class="keyword">new</span> ModelAndView(<span class="string">&quot;forward:worklist.jsp&quot;</span>);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;datalist&quot;</span>, list);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;page&quot;</span>, page);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;juan&quot;</span>, juan);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;juansum&quot;</span>, pageinfo.getPages() % <span class="number">5</span> == <span class="number">0</span> ? pageinfo.getPages() / <span class="number">5</span> : pageinfo.getPages() / <span class="number">5</span> + <span class="number">1</span>);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;pages&quot;</span>, pageinfo.getPages());</span><br><span class="line">      mlv.addObject(<span class="string">&quot;loadok&quot;</span>, <span class="string">&quot;ok&quot;</span>);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;pagesize&quot;</span>, pagesize);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;total&quot;</span>, pageinfo.getTotal());</span><br><span class="line">      <span class="keyword">return</span> mlv;</span><br><span class="line">  &#125;    </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> ModelAndView <span class="title">showwork</span><span class="params">(HttpServletRequest request, <span class="meta">@RequestParam(defaultValue = &quot;1&quot;,required = true)</span> Integer page, Integer user_id, <span class="meta">@RequestParam(defaultValue = &quot;1&quot;,required = true)</span> Integer juan, CcWorks ccWorks)</span> </span>&#123;</span><br><span class="line">      Integer pagesize = <span class="number">5</span>;</span><br><span class="line">      CcWorks temp = <span class="keyword">new</span> CcWorks();</span><br><span class="line">      temp.setWork_id(ccWorks.getWork_id());</span><br><span class="line">      <span class="keyword">if</span> (ccWorks.getWork_name() != <span class="keyword">null</span> &amp;&amp; !<span class="string">&quot;&quot;</span>.equals(ccWorks.getWork_name())) &#123;</span><br><span class="line">          temp.setWork_name(<span class="string">&quot;%&quot;</span> + ccWorks.getWork_name() + <span class="string">&quot;%&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      temp.setWork_date((Date)ccWorks.getWork_date());</span><br><span class="line">      temp.setWork_image(ccWorks.getWork_image());</span><br><span class="line">      temp.setWork_value(ccWorks.getWork_value());</span><br><span class="line">      List&lt;CcUsers&gt; selectusers = <span class="keyword">this</span>.workService.selectusers();</span><br><span class="line">      CcUsers tempuser = <span class="keyword">new</span> CcUsers();</span><br><span class="line">      tempuser.setUser_id(user_id);</span><br><span class="line">      temp.setWork_member(tempuser);</span><br><span class="line">      PageInfo&lt;CcWorks&gt; pageinfo = <span class="keyword">this</span>.workService.selectpage(page, pagesize, temp);</span><br><span class="line">      List&lt;CcWorks&gt; dataList = pageinfo.getList();</span><br><span class="line">      ModelAndView mlv = <span class="keyword">new</span> ModelAndView(<span class="string">&quot;showwork&quot;</span>);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;page&quot;</span>, page);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;pagesize&quot;</span>, pagesize);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;total&quot;</span>, pageinfo.getTotal());</span><br><span class="line">      mlv.addObject(<span class="string">&quot;pages&quot;</span>, pageinfo.getPages());</span><br><span class="line">      mlv.addObject(<span class="string">&quot;juan&quot;</span>, juan);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;juansum&quot;</span>, pageinfo.getPages() % <span class="number">5</span> == <span class="number">0</span> ? pageinfo.getPages() / <span class="number">5</span> : pageinfo.getPages() / <span class="number">5</span> + <span class="number">1</span>);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;datalist&quot;</span>, dataList);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;oladstop&quot;</span>, <span class="string">&quot;ok&quot;</span>);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;condition&quot;</span>, ccWorks);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;selectusers&quot;</span>, selectusers);</span><br><span class="line">      mlv.addObject(<span class="string">&quot;user_id&quot;</span>, user_id);</span><br><span class="line">      <span class="keyword">return</span> mlv;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>再看一下，写入输入库时：<code>Integer updatework = this.workService.updatework(ccworks);</code>，直接update</p>
+<p><img src="/2021/09/15/cnccms/image-20210915174322383.png" alt="image-20210915174322383"></p>
+<p><img src="/2021/09/15/cnccms/image-20210915174339039.png" alt="image-20210915174339039"></p>
+<p><img src="/2021/09/15/cnccms/image-20210915174352412.png" alt="image-20210915174352412"></p>
+<h4 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h4><p><img src="/2021/09/15/cnccms/image-20210915183238697.png" alt="image-20210915183238697"></p>
+<p>后台有许多上传点，不过都没有限制措施</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping(&#123;&quot;/WEB-INF/admin/addwork&quot;&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">addwork</span><span class="params">(<span class="meta">@RequestParam(&quot;wrok_image&quot;)</span> MultipartFile wrok_image, CcWorks ccWorks, HttpServletResponse response, HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;图片名称&quot;</span> + wrok_image.getOriginalFilename());</span><br><span class="line">    ccWorks.setWork_date(<span class="keyword">new</span> Date((<span class="keyword">new</span> java.util.Date()).getTime()));</span><br><span class="line">    HttpSession session = request.getSession();</span><br><span class="line">    CcUsers admin = (CcUsers)session.getAttribute(<span class="string">&quot;admin&quot;</span>);</span><br><span class="line">    ccWorks.setWork_member(admin);</span><br><span class="line">    String realPath = request.getRealPath(<span class="string">&quot;/img/work/&quot;</span>);</span><br><span class="line">    String imagename = (<span class="keyword">new</span> java.util.Date()).getTime() + wrok_image.getOriginalFilename().substring(wrok_image.getOriginalFilename().lastIndexOf(<span class="string">&quot;.&quot;</span>));</span><br><span class="line">    System.out.println(imagename);</span><br><span class="line">    InputStream inputStream = <span class="keyword">null</span>;</span><br><span class="line">    FileOutputStream outputStream = <span class="keyword">null</span>;</span><br><span class="line">    File file = <span class="keyword">null</span>;</span><br><span class="line">    System.out.println(realPath);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        inputStream = wrok_image.getInputStream();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException var29) &#123;</span><br><span class="line">        var29.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (inputStream != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            file = <span class="keyword">new</span> File(realPath + <span class="string">&quot;\\&quot;</span> + imagename);</span><br><span class="line">            <span class="keyword">if</span> (!file.exists()) &#123;</span><br><span class="line">                file.createNewFile();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            ccWorks.setWork_image(<span class="string">&quot;/img/work/&quot;</span> + imagename);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException var27) &#123;</span><br><span class="line">            var27.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException var28) &#123;</span><br><span class="line">            var28.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Integer insertwork = <span class="keyword">this</span>.workService.insertwork(ccWorks);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (insertwork &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            response.setContentType(<span class="string">&quot;text/html;charset=utf-8&quot;</span>);</span><br><span class="line">            PrintWriter writer = response.getWriter();</span><br><span class="line">            writer.print(<span class="string">&quot;&lt;script type=&#x27;text/javascript&#x27;&gt;alert(&#x27;添加失败&#x27;);history.go(-1);&lt;/script&gt;&quot;</span>);</span><br><span class="line">            writer.close();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            outputStream = <span class="keyword">new</span> FileOutputStream(file);</span><br><span class="line">            IOUtils.copy(inputStream, outputStream);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException var25) &#123;</span><br><span class="line">        var25.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (inputStream != <span class="keyword">null</span>) &#123;</span><br><span class="line">                inputStream.close();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (outputStream != <span class="keyword">null</span>) &#123;</span><br><span class="line">                outputStream.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException var24) &#123;</span><br><span class="line">            var24.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;redirect:showwork.jsp&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不过这里多加了一个<code>\</code>，迷惑，可能是系统原因？</p>
+<p><img src="/2021/09/15/cnccms/image-20210915183836772.png" alt="image-20210915183836772"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">file = <span class="keyword">new</span> File(realPath + <span class="string">&quot;\\&quot;</span> + imagename);</span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>有点感觉了，还得多熟悉关键字。</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a target="_blank" rel="noopener" href="http://foreversong.cn/archives/1033">http://foreversong.cn/archives/1033</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1"><span class="toc-number">2.</span> <span class="toc-text">代码审计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%89%8D%E5%8F%B0"><span class="toc-number">2.1.</span> <span class="toc-text">前台</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8E%E5%8F%B0"><span class="toc-number">2.2.</span> <span class="toc-text">后台</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#xss"><span class="toc-number">2.2.1.</span> <span class="toc-text">xss</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="toc-number">2.3.</span> <span class="toc-text">文件上传</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reference"><span class="toc-number">4.</span> <span class="toc-text">Reference</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.b1ank.top/2021/09/15/cnccms/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.b1ank.top/2021/09/15/cnccms/&text=Java代码审计学习（三）"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.b1ank.top/2021/09/15/cnccms/&is_video=false&description=Java代码审计学习（三）"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java代码审计学习（三）&body=Check out this article: https://blog.b1ank.top/2021/09/15/cnccms/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.b1ank.top/2021/09/15/cnccms/&title=Java代码审计学习（三）"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.b1ank.top/2021/09/15/cnccms/&name=Java代码审计学习（三）&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.b1ank.top/2021/09/15/cnccms/&t=Java代码审计学习（三）"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2018-2021
+    b1ank
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/b1ank1108">Projects</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
