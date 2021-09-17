@@ -8,7 +8,7 @@
       <link href="2021/09/17/att&amp;ck01/"/>
       <url>2021/09/17/att&amp;ck01/</url>
       
-        <content type="html"><![CDATA[<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><ul><li><p>宿舍wifi环境，有两台笔记本，所以选择桥接模拟外网</p></li><li><p>win7 两张网卡 vmnet0(设置桥接)/vmnet1(仅主机模式)</p></li><li><p>win2k3 vmnet1(仅主机模式)</p></li><li><p>win2k8 vmnet1(仅主机模式)</p></li><li><p>win7 需要先启动phpstudy</p></li></ul><h3 id="外网渗透"><a href="#外网渗透" class="headerlink" title="外网渗透"></a>外网渗透</h3><h3 id="内网渗透"><a href="#内网渗透" class="headerlink" title="内网渗透"></a>内网渗透</h3>]]></content>
+        <content type="html"><![CDATA[<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><ul><li><p>宿舍wifi环境，手头有两台笔记本，所以选择桥接模拟外网</p></li><li><p>win7 两张网卡 vmnet0(设置桥接)/vmnet1(仅主机模式)</p></li><li><p>win2k3 vmnet1(仅主机模式)</p></li><li><p>win2k8 vmnet1(仅主机模式)</p></li><li><p>win7 需要先启动phpstudy</p></li></ul><h3 id="外网渗透"><a href="#外网渗透" class="headerlink" title="外网渗透"></a>外网渗透</h3><h3 id="内网渗透"><a href="#内网渗透" class="headerlink" title="内网渗透"></a>内网渗透</h3>]]></content>
       
       
       
